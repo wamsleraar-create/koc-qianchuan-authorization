@@ -1,0 +1,27 @@
+{
+  "tasks": {
+    "example": {
+      "task_key": "example",
+      "status": "等待达人授权",
+      "chat_id": "oc_example_project_group",
+      "feedback_chat_id": "oc_example_feedback_group",
+      "customer_account_name": "客户账户名称",
+      "customer_account_id": "123456789",
+      "task": {
+        "publish_link": "https://www.douyin.com/video/123",
+        "douyin_id": "987654321",
+        "cooperation_code": "KOC-001",
+        "daily_budget": "300",
+        "bid_or_roi_target": "ROI 1.2",
+        "conversion_goal": "商品成交",
+        "schedule": "全天",
+        "audience": "不限",
+        "asset_rule": "使用发布链接视频",
+        "plan_name": "KOC测试-987654321"
+      },
+      "warnings": [],
+      "created_at": "2026-06-11T00:00:00+00:00",
+      "updated_at": "2026-06-11T00:00:00+00:00"
+    }
+  }
+}

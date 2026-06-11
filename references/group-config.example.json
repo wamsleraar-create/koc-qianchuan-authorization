@@ -1,0 +1,25 @@
+{
+  "groups": {
+    "oc_example_project_group": {
+      "group_name": "KOC 项目测试群",
+      "customer_account_name": "客户账户名称",
+      "customer_account_id": "123456789",
+      "feedback_chat_id": "oc_example_feedback_group",
+      "bidder_initials": "WMQ",
+      "allow_smart_coupon": true,
+      "plan_defaults": {
+        "daily_budget": "300",
+        "bid_or_roi_target": "3",
+        "conversion_goal": "净成交ROI目标",
+        "schedule": "全天",
+        "audience": "无",
+        "asset_rule": "使用发布链接视频",
+        "smart_coupon": "启用",
+        "plan_name_template": "【{bidder_initials}】-{mmdd}-{koc_name}-{product_name}"
+      },
+      "product_defaults": {
+        "3823114170367345046": "柚子香"
+      }
+    }
+  }
+}
