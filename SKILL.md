@@ -26,7 +26,7 @@ Use this skill for the semi-automatic “部门龙虾” flow in KOC project gro
 10. If 千川 says `当前商品在该抖音号下已存在全域推商品-控成本投放计划`, do not create a duplicate plan. Open 【查看计划详情】, switch to 【素材】, and use 【添加视频】 to append the new KOC video as 自选投放素材 to the existing plan.
 11. For KOC video-commerce plans, use 【自选投放素材】 when material selection is required; do not rely only on default intelligent material selection if the workflow asks for the KOC video asset. Search by the Douyin share link. If 千川 reports that the homepage video's cart product does not match the selected product ID, stop and feedback that the 商品ID is likely wrong.
 12. Treat 【智能优惠券】 as a project/brand policy setting. It is allowed for the current 得宝 KOC test project, but other brands must not have coupons enabled unless the group config or message explicitly allows it. If 千川 defaults coupons on and the project policy is unknown or disallows coupons, stop before submission and feedback for confirmation.
-13. Plan name convention defaults to `【WMQ】-MMDD-达人名称-商品名称` when the group message does not provide a better exact plan name. Product name can be a short business alias from the message, group memory, or the selected product title.
+13. Plan name convention comes from the project/group preset. A common template is `【{bidder_initials}】-{mmdd}-{koc_name}-{product_name}`. `WMQ` is only a test/project example, not a fixed default.
 14. Before final plan submission, summarize account, 抖音号, 合作码, 商品ID, 商品名称, 发布链接, budget, bid/ROI, conversion goal, schedule, audience, asset rule, coupon policy, and plan name. In production, wait for group confirmation; in an explicitly approved test run, pass the submit flag.
 
 ## Message Contract

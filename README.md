@@ -30,27 +30,29 @@ https://agent.oceanengine.com/admin/optimizeModule/qianchuan/promotion/domain/ro
 
 ## New Project Group Setup
 
-When a new KOC project group pulls in 部门龙虾 / 司南, create a group config preset first:
+When a new KOC project group pulls in 部门龙虾 / 司南, create a group config preset first. The values below are placeholders. Fill them per project; do not treat the numbers, ROI, coupon status, product, or bidder initials as fixed defaults.
 
 ```bash
 python3 scripts/lark_koc_flow.py write-group-config \
   --output state/koc_groups.json \
   --project-chat-id oc_project_group \
-  --project-group-name "KOC 项目群" \
+  --project-group-name "项目群名称" \
   --feedback-chat-id oc_feedback_group \
-  --customer-account-name "客户账户名称" \
-  --customer-account-id "123456789" \
-  --daily-budget "300" \
-  --roi-target "3" \
-  --conversion-goal "净成交ROI目标" \
-  --schedule "全天" \
-  --audience "无" \
-  --asset-rule "使用发布链接视频" \
-  --smart-coupon "启用" \
-  --allow-smart-coupon true \
-  --bidder-initials "WMQ" \
+  --customer-account-name "按项目填写客户账户名称" \
+  --customer-account-id "按项目填写客户账户ID" \
+  --daily-budget "按项目填写日预算" \
+  --roi-target "按项目填写ROI目标" \
+  --conversion-goal "按项目填写转化目标" \
+  --schedule "按项目填写投放时段" \
+  --audience "按项目填写定向/人群" \
+  --asset-rule "按项目填写素材规则" \
+  --smart-coupon "启用/不启用/按项目配置" \
+  --allow-smart-coupon false \
+  --bidder-initials "按项目填写投手缩写" \
   --plan-name-template "【{bidder_initials}】-{mmdd}-{koc_name}-{product_name}"
 ```
+
+For example, the 得宝 test project used `300`, `3`, `净成交ROI目标`, `全天`, `无`, `启用`, and `WMQ`; those are test/project values only.
 
 After that, content teammates can send a shorter KOC message with the post details. If a brand has multiple products, the message should include 商品ID and 商品名称.
 
@@ -58,12 +60,12 @@ After that, content teammates can send a shorter KOC message with the post detai
 
 ```text
 发布链接：https://v.douyin.com/xxxx/
-达人名称：大甜甜
-合作码：65638236777
-抖音号：L9908311
-账号UID：1814643757557485
-商品ID：3823114170367345046
-商品名称：柚子香
+达人名称：达人名称
+合作码：合作码
+抖音号：抖音号
+账号UID：账号UID
+商品ID：商品ID
+商品名称：商品名称
 ```
 
 If 商品ID / 商品名称 are omitted, the group config must have exactly one unambiguous default product.
@@ -82,4 +84,3 @@ If 商品ID / 商品名称 are omitted, the group config must have exactly one u
 ```bash
 python3 scripts/smoke_test.py
 ```
-

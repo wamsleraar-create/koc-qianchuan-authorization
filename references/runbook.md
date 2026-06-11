@@ -113,7 +113,7 @@ Search the target 千川 account before initiating authorization:
 - When adding a video, search by the Douyin share link. If 千川 says the homepage video's cart product does not match the selected product ID, stop and feedback that the 商品ID is likely wrong; ask the sender to provide the product ID actually mounted on the video.
 - 【智能优惠券】 must follow the project/brand policy. For the current 得宝 KOC test project it can stay enabled. For other brands, default to not enabling coupons unless `allow_smart_coupon=true` is present in the group config or the trigger message explicitly says coupons are allowed. If the page defaults coupons on and policy is not allowed/unknown, stop before submission and ask for confirmation.
 - Fill 日预算、净成交ROI目标、计划名称 after 商品 and素材 are selected; then stop at pre-submit summary unless the run is explicitly approved for submission.
-- Default plan naming is `【WMQ】-MMDD-达人名称-商品名称`, for example `【WMQ】-0611-大甜甜-柚子香`.
+- Plan naming comes from the project/group preset. A common template is `【{bidder_initials}】-{mmdd}-{koc_name}-{product_name}`. Values such as `WMQ`, `300`, `3`, and `柚子香` are examples from one test project, not fixed defaults.
 
 ## Stop Conditions
 

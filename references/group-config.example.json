@@ -1,24 +1,24 @@
 {
   "groups": {
     "oc_example_project_group": {
-      "group_name": "KOC 项目测试群",
-      "customer_account_name": "客户账户名称",
-      "customer_account_id": "123456789",
+      "group_name": "项目群名称",
+      "customer_account_name": "按项目填写客户账户名称",
+      "customer_account_id": "按项目填写客户账户ID",
       "feedback_chat_id": "oc_example_feedback_group",
-      "bidder_initials": "WMQ",
-      "allow_smart_coupon": true,
+      "bidder_initials": "按项目填写投手缩写",
+      "allow_smart_coupon": false,
       "plan_defaults": {
-        "daily_budget": "300",
-        "bid_or_roi_target": "3",
-        "conversion_goal": "净成交ROI目标",
-        "schedule": "全天",
-        "audience": "无",
-        "asset_rule": "使用发布链接视频",
-        "smart_coupon": "启用",
+        "daily_budget": "按项目填写日预算",
+        "bid_or_roi_target": "按项目填写ROI目标",
+        "conversion_goal": "按项目填写转化目标",
+        "schedule": "按项目填写投放时段",
+        "audience": "按项目填写定向/人群",
+        "asset_rule": "按项目填写素材规则",
+        "smart_coupon": "启用/不启用/按项目配置",
         "plan_name_template": "【{bidder_initials}】-{mmdd}-{koc_name}-{product_name}"
       },
       "product_defaults": {
-        "3823114170367345046": "柚子香"
+        "商品ID_按项目填写": "商品名称_按项目填写"
       }
     }
   }
