@@ -5,6 +5,7 @@ Use this path when the user says the 巨量方舟 / 千川 session is already lo
 ## Browser Rules
 
 - Use the Chrome plugin / current Chrome tab control, not `scripts/qianchuan_flow.py`, when live login state matters.
+- If no controllable Chrome/browser node is available, stop direct 千川 operation and switch to manual-assist mode. Tell the group that this runtime can parse and prepare the checklist, but a browser-enabled 龙虾 or responsible PM must operate 千川.
 - Claim an existing tab if it is already on `agent.oceanengine.com`; otherwise open `https://agent.oceanengine.com/admin/optimizeModule/qianchuan/promotion/domain/roi2-adv` in Chrome.
 - Never inspect cookies, local storage, passwords, or profile files.
 - First-time login must be completed by the responsible project 追投 PM. Stop for CAPTCHA, SMS, scan code, password, account-risk verification, or missing login state.

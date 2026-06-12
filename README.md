@@ -18,9 +18,15 @@ The skill can be installed by cloud agents and by multiple 龙虾 assistants fro
 - Feishu/Lark app or user permissions.
 - Project group config.
 - 巨量方舟/千川 account permission.
-- Browser session or login state.
+- Browser/Chrome control capability plus a browser session or login state.
 
 First-time 巨量方舟/千川 login must be completed by the responsible project 追投 PM. The skill resumes after 千川 is already open and authenticated.
+
+Important deployment rule:
+
+- If a 云端虾 / 司南 runtime has no controllable Chrome/browser connector, it cannot click 千川后台. In that environment, the skill must run in "manual-assist mode": parse the group message, apply group presets, check that required fields are present, and output the exact authorization/plan-building checklist for a human PM.
+- For direct backend operation, deploy this skill in a local Codex Desktop, cloud desktop, or agent runtime that exposes a controllable Chrome/browser node. The responsible 追投 PM must log in there first.
+- A Feishu chat bot alone is not enough for full automation; it only supplies group-message access.
 
 Entry URL:
 

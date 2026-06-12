@@ -100,6 +100,7 @@ Search the target 千川 account before initiating authorization:
 ## Browser Selection
 
 - For the real service-provider backend, prefer the current Chrome session via the Chrome plugin. This reuses the user's existing 巨量方舟 login state.
+- Cloud/text-only agents without a browser connector cannot directly click 千川. They should run manual-assist mode: parse messages, apply group defaults, and output the exact PM checklist.
 - Use `scripts/qianchuan_flow.py` only as a fallback with an explicit Chrome profile, because it starts a separate Playwright-controlled browser context and may require another login.
 
 ## Plan Building Rules
