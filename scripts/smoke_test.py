@@ -26,13 +26,13 @@ SAMPLE_MESSAGE = """@部门龙虾
 计划命名：KOC测试-987654321
 """
 
-MINIMAL_MESSAGE = """4.30 复制打开抖音，看看【大甜甜的作品】满满柚子香的纸巾 还有Pingu印花超可爱！#得宝Pingu#得宝纸巾 #Pingu - 抖音 https://v.douyin.com/cWbIRwwZX8c/
-大甜甜
-合作码：65638236777
-抖音号：L9908311
-账号UID：1814643757557485
-商品ID：3823114170367345046
-商品名称：柚子香
+MINIMAL_MESSAGE = """复制打开抖音，看看【示例达人的作品】示例商品视频标题 - 抖音 https://v.douyin.com/example/
+示例达人
+合作码：EXAMPLE-CODE
+抖音号：EXAMPLE_DOUYIN_ID
+账号UID：EXAMPLE_UID
+商品ID：EXAMPLE_PRODUCT_ID
+商品名称：示例商品
 """
 
 
@@ -162,7 +162,7 @@ def assert_cli_flow(script_dir: Path) -> None:
         assert minimal_task["daily_budget"] == "300"
         assert minimal_task["bid_or_roi_target"] == "3"
         assert minimal_task["smart_coupon"] == "启用"
-        assert minimal_task["plan_name"].endswith("-大甜甜-柚子香")
+        assert minimal_task["plan_name"].endswith("-示例达人-示例商品")
 
 
 def main() -> int:
