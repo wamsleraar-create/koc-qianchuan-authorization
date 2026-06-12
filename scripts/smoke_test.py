@@ -78,6 +78,12 @@ def assert_cli_flow(script_dir: Path) -> None:
                 "测试客户",
                 "--customer-account-id",
                 "123456",
+                "--responsible-pm",
+                "测试追投PM",
+                "--browser-runtime",
+                "测试PM的Chrome运行环境",
+                "--login-note",
+                "首次由测试追投PM登录",
                 "--daily-budget",
                 "300",
                 "--roi-target",
@@ -101,6 +107,8 @@ def assert_cli_flow(script_dir: Path) -> None:
             ]
         )
         assert config["ok"] is True
+        assert config["group"]["responsible_pm"] == "测试追投PM"
+        assert config["group"]["browser_runtime"] == "测试PM的Chrome运行环境"
         assert config_path.exists()
 
         registered = run_cmd(

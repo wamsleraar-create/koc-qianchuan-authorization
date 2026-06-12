@@ -240,6 +240,12 @@ def write_group_config(args: argparse.Namespace) -> int:
         "customer_account_id": args.customer_account_id or "",
         "feedback_chat_id": args.feedback_chat_id or args.project_chat_id,
     }
+    if args.responsible_pm:
+        group["responsible_pm"] = args.responsible_pm
+    if args.browser_runtime:
+        group["browser_runtime"] = args.browser_runtime
+    if args.login_note:
+        group["login_note"] = args.login_note
     plan_defaults = {
         "daily_budget": args.daily_budget or "",
         "bid_or_roi_target": args.roi_target or "",
@@ -465,6 +471,9 @@ def main() -> int:
     cfg.add_argument("--feedback-chat-id")
     cfg.add_argument("--customer-account-name", required=True)
     cfg.add_argument("--customer-account-id", default="")
+    cfg.add_argument("--responsible-pm", default="", help="追投 PM who owns the Qianchuan login/permission for this project.")
+    cfg.add_argument("--browser-runtime", default="", help="Browser-enabled runtime/session name that should operate Qianchuan for this group.")
+    cfg.add_argument("--login-note", default="", help="Optional note about first login, Chrome profile, or account permission.")
     cfg.add_argument("--daily-budget", default="")
     cfg.add_argument("--roi-target", default="")
     cfg.add_argument("--conversion-goal", default="")

@@ -30,6 +30,9 @@ The JSON shape is:
       "group_name": "KOC 项目群",
       "customer_account_name": "客户账户名称",
       "customer_account_id": "123456789",
+      "responsible_pm": "负责该项目的追投PM",
+      "browser_runtime": "该PM已登录的可控浏览器环境名称",
+      "login_note": "首次由负责PM在该环境登录，验证码/扫码由PM处理",
       "feedback_chat_id": "oc_xxx"
     }
   }
@@ -41,6 +44,9 @@ The JSON shape is:
 For new KOC project groups, configure project defaults before content teammates start sending KOC posts. The preset can include:
 
 - `customer_account_name` / `customer_account_id`
+- `responsible_pm`
+- `browser_runtime`
+- `login_note`
 - `daily_budget`
 - `bid_or_roi_target`
 - `conversion_goal`
@@ -102,6 +108,14 @@ Search the target 千川 account before initiating authorization:
 - For the real service-provider backend, prefer the current Chrome session via the Chrome plugin. This reuses the user's existing 巨量方舟 login state.
 - Cloud/text-only agents without a browser connector cannot directly click 千川. They should run manual-assist mode: parse messages, apply group defaults, and output the exact PM checklist.
 - Use `scripts/qianchuan_flow.py` only as a fallback with an explicit Chrome profile, because it starts a separate Playwright-controlled browser context and may require another login.
+
+## Multi-PM Login Routing
+
+- The skill package can be installed once and used by all 龙虾 / 司南 assistants, but 千川 login must be routed per project group.
+- Each KOC project group should record the responsible 追投 PM and the browser-enabled runtime/session where that PM logs into 巨量方舟/千川.
+- Before live backend operation, confirm that the current browser login belongs to the responsible PM or has explicit permission for the configured customer account.
+- If the current runtime has no browser connector, or the browser login is from a different PM without confirmed permission, do not continue in 千川. Output the manual checklist and ask the responsible PM to run/login from the assigned browser runtime.
+- Never treat one PM's authenticated browser as a shared global account for all KOC projects.
 
 ## Plan Building Rules
 

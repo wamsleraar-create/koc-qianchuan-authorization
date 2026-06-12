@@ -22,10 +22,12 @@ The skill can be installed by cloud agents and by multiple 龙虾 assistants fro
 
 First-time 巨量方舟/千川 login must be completed by the responsible project 追投 PM. The skill resumes after 千川 is already open and authenticated.
 
+For multi-PM usage, do not share one fixed 千川 login. Bind each project group to the responsible 追投 PM and to the browser-enabled runtime/session that PM has logged into. The shared GitHub skill provides the same procedure for every 龙虾 / 司南 instance; the live 千川 permission comes from the PM's own authenticated browser environment.
+
 Important deployment rule:
 
 - If a 云端虾 / 司南 runtime has no controllable Chrome/browser connector, it cannot click 千川后台. In that environment, the skill must run in "manual-assist mode": parse the group message, apply group presets, check that required fields are present, and output the exact authorization/plan-building checklist for a human PM.
-- For direct backend operation, deploy this skill in a local Codex Desktop, cloud desktop, or agent runtime that exposes a controllable Chrome/browser node. The responsible 追投 PM must log in there first.
+- For direct backend operation, deploy this skill in a local Codex Desktop, cloud desktop, or agent runtime that exposes a controllable Chrome/browser node. Each responsible 追投 PM must log in from their assigned runtime/browser session first.
 - A Feishu chat bot alone is not enough for full automation; it only supplies group-message access.
 
 Entry URL:
@@ -46,6 +48,9 @@ python3 scripts/lark_koc_flow.py write-group-config \
   --feedback-chat-id oc_feedback_group \
   --customer-account-name "按项目填写客户账户名称" \
   --customer-account-id "按项目填写客户账户ID" \
+  --responsible-pm "负责该项目的追投PM" \
+  --browser-runtime "该PM已登录的可控浏览器环境名称" \
+  --login-note "首次由负责PM在该环境登录，遇到验证码/扫码由PM处理" \
   --daily-budget "按项目填写日预算" \
   --roi-target "按项目填写ROI目标" \
   --conversion-goal "按项目填写转化目标" \

@@ -13,9 +13,11 @@ Use this skill for the semi-automatic “部门龙虾” flow in KOC project gro
 2. Parse and validate the message with `scripts/parse_koc_message.py`.
 3. Resolve the bound customer account from a group config JSON. Prefer `customer_account_id`; use account name only when the ID is missing.
    - For a new KOC project group, create a group preset before processing posts. Presets can include customer account, budget, ROI, conversion goal, schedule, audience, asset rule, smart coupon policy, bidder initials, and plan name template.
+   - For multi-PM usage, the group preset should also record the responsible 追投 PM and the browser-enabled runtime/session that PM owns. The skill is shared by all 龙虾 / 司南 instances, but 千川 login state and account permission are per PM/browser session.
    - After a group preset exists, content teammates may send a shorter KOC post message. Missing plan fields are filled from the group preset; 商品ID and 商品名称 should still be supplied when the brand has multiple products.
 4. Open 巨量方舟 / 巨量千川 from `https://agent.oceanengine.com/admin/optimizeModule/qianchuan/promotion/domain/roi2-adv` with the user's current Chrome login state. First-time login for a project must be completed by the responsible 追投 PM; the skill only reuses an already-authenticated browser session. Prefer the Chrome plugin for live backend operations. Use `scripts/qianchuan_flow.py` only as a Playwright fallback when a separate browser profile is acceptable.
    - If the current runtime has no controllable Chrome/browser connector, do not claim the workflow can operate 千川 directly. Switch to manual-assist mode: parse the task, apply group presets, report the exact authorization/plan-building checklist, and ask for the PM to run it in a browser-enabled runtime.
+   - If a group is assigned to a different 追投 PM than the current browser login, stop before backend operation and ask that PM to open/login from the assigned runtime. Do not operate a project through another PM's 千川 login unless the user explicitly confirms that account has the correct permission.
 5. Before initiating any new authorization, search the target 千川 account's 【抖音号授权】 and 【全域投放授权】 lists by KOC达人名称 first; if needed also search by 抖音号/ID. Prefer exact matches on达人名称 + 抖音号.
 6. Read the visible authorization status for both rows:
    - If 【抖音号授权】 and 【全域投放授权】 both show `授权生效`, record `授权通过` and go directly to plan building.
@@ -107,4 +109,5 @@ Use `references/runbook.md` for operator rules, confirmation points, and known s
 - Treat CAPTCHA, SMS, password, and扫码 steps as user-handled.
 - First-time 巨量方舟/千川 login must be performed by the responsible project 追投 PM. Do not bypass login security; resume only after the browser is already inside 千川.
 - A Feishu bot or cloud text-only agent without a controllable browser can read messages and prepare instructions, but cannot directly operate 千川.
+- Do not reuse one PM's authenticated 千川 browser session as a global login for all projects. Route each project group to its configured responsible PM/browser runtime.
 - If the backend UI wording differs from the expected labels, pause and report the visible alternatives instead of guessing.
