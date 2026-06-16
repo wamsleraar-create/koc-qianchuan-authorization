@@ -162,6 +162,66 @@ Stop and report `异常需人工处理` when:
 - The parsed plan budget or ROI target is inconsistent with the message.
 - 智能优惠券 is enabled while the project/brand policy is unknown or disallows coupons.
 
+## Required Issue Feedback Format
+
+When reporting any plan/material result back to the project group, first @ the responsible 追投 PM from the group preset, then use this exact field order. Do not replace it with a long narrative. Fill unknown values with `未获取到` only when the backend does not expose the field after a reasonable check.
+
+```text
+@{responsible_pm}
+计划：{plan_name}
+计划 ID：{plan_id}
+搭建好时间：{built_at}
+素材 ID：{material_id}
+商品 ID：{product_id}
+状态：{plan_status}，{material_status}（{build_source}）
+预算：{daily_budget}
+ROI：{roi_target}
+优惠券：{smart_coupon}
+达人：{koc_name}（抖音号：{douyin_id}）
+商品：{product_name}（商品ID：{product_id}）
+结论：{conclusion}
+```
+
+Field rules:
+
+- `@{responsible_pm}`: must be the configured responsible 追投 PM. If the Feishu API path supports rich-text mention by `open_id`, send a real mention; otherwise put `@姓名` as the first text line and report that the PM mention ID is missing from the group preset.
+- `计划`: the visible 千川 plan name, such as `【WMQ】-0616-钱炸炸-柚子香`.
+- `计划 ID`: the visible 千川 plan ID.
+- `搭建好时间`: use the actual creation/append/completion time when visible; otherwise use the time the issue was verified and closed.
+- `素材 ID`: the visible素材 ID for the current发布链接/video. If the task closed because the same素材 was already in the plan, still report that existing素材 ID when visible.
+- `商品 ID`: the product ID from the trigger message or matched plan.
+- `状态`: combine the visible plan state and material review state, then append source in parentheses:
+  - `issue搭建` when 龙虾/司南 created the plan or appended the material during this task.
+  - `人工已搭建好` when a PM had already created the plan/material before 龙虾/司南 operated.
+  - `issue确认已有计划` when 龙虾/司南 only verified an existing plan and did not change it.
+- `预算`: the visible daily budget in 千川, not only the requested budget.
+- `ROI`: the visible ROI target in 千川, not only the requested ROI.
+- `优惠券`: the visible smart coupon status. If the project policy disallows coupons but the plan shows coupons enabled, stop and report `异常需人工处理` instead of closing.
+- `达人`: the matched KOC达人 and 抖音号/ID. If the visible plan达人 differs from the trigger message, stop and report ambiguity.
+- `商品`: the matched product name and product ID. If the visible plan商品 differs from the trigger 商品ID, stop and report ambiguity.
+- `结论`: summarize the business closure. Examples:
+  - `本次发布链接对应视频已经在计划里，所以没有追加、没有重复建计划。`
+  - `已有同达人/抖音号 + 商品ID计划，本次仅追加素材，没有重复建计划。`
+  - `未找到同达人/抖音号 + 商品ID计划，本次已新建计划并添加发布链接对应视频。`
+
+Example:
+
+```text
+@翁美祺
+计划：【WMQ】-0616-钱炸炸-柚子香
+计划 ID：1868150564460612
+搭建好时间：2026-06-16 18:30
+素材 ID：7651944609197326370
+商品 ID：3823114170367345046
+状态：计划投放中，素材审核通过（人工已搭建好）
+预算：300元/日
+ROI：2.7（净成交ROI）
+优惠券：已开启
+达人：钱炸炸（抖音号：7474803）
+商品：柚子香（商品ID：3823114170367345046）
+结论：本次发布链接对应视频已经在计划里，所以没有追加、没有重复建计划。
+```
+
 ## Suggested Feedback Text
 
 Authorization already active:
@@ -202,39 +262,53 @@ Authorization initiated:
 Plan created:
 
 ```text
-KOC 千川计划已创建
-客户账户：{customer_account_name}（{customer_account_id}）
-计划名称：{plan_name}
-商品ID：{product_id}
-商品名称：{product_name}
-抖音号：{douyin_id}
-合作码：{cooperation_code}
+@{responsible_pm}
+计划：{plan_name}
+计划 ID：{plan_id}
+搭建好时间：{built_at}
+素材 ID：{material_id}
+商品 ID：{product_id}
+状态：{plan_status}，{material_status}（issue搭建）
+预算：{daily_budget}
+ROI：{roi_target}
+优惠券：{smart_coupon}
+达人：{koc_name}（抖音号：{douyin_id}）
+商品：{product_name}（商品ID：{product_id}）
+结论：未找到同达人/抖音号 + 商品ID计划，本次已新建计划并添加发布链接对应视频。
 ```
 
 Plan/material already complete:
 
 ```text
-KOC 千川任务已闭环，无需重复操作
-客户账户：{customer_account_name}（{customer_account_id}）
-达人：{koc_name}
-抖音号：{douyin_id}
-商品ID：{product_id}
-商品名称：{product_name}
-计划名称/ID：{plan_name_or_id}
-计划状态：{plan_status}
-素材状态：当前发布链接/视频素材已在计划中
-处理结论：PM已完成 / 素材已存在，不再发起授权或重复建计划
+@{responsible_pm}
+计划：{plan_name}
+计划 ID：{plan_id}
+搭建好时间：{built_at}
+素材 ID：{material_id}
+商品 ID：{product_id}
+状态：{plan_status}，{material_status}（人工已搭建好）
+预算：{daily_budget}
+ROI：{roi_target}
+优惠券：{smart_coupon}
+达人：{koc_name}（抖音号：{douyin_id}）
+商品：{product_name}（商品ID：{product_id}）
+结论：本次发布链接对应视频已经在计划里，所以没有追加、没有重复建计划。
 ```
 
 Existing plan, material appended:
 
 ```text
-KOC 千川素材已追加到已有计划
-客户账户：{customer_account_name}（{customer_account_id}）
-达人：{koc_name}
-抖音号：{douyin_id}
-商品ID：{product_id}
-商品名称：{product_name}
-计划名称/ID：{plan_name_or_id}
-处理结果：已有同达人/抖音号 + 商品ID计划，本次仅追加素材
+@{responsible_pm}
+计划：{plan_name}
+计划 ID：{plan_id}
+搭建好时间：{built_at}
+素材 ID：{material_id}
+商品 ID：{product_id}
+状态：{plan_status}，{material_status}（issue搭建）
+预算：{daily_budget}
+ROI：{roi_target}
+优惠券：{smart_coupon}
+达人：{koc_name}（抖音号：{douyin_id}）
+商品：{product_name}（商品ID：{product_id}）
+结论：已有同达人/抖音号 + 商品ID计划，本次仅追加素材，没有重复建计划。
 ```

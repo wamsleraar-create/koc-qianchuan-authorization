@@ -17,6 +17,7 @@ SAMPLE_MESSAGE = """@部门龙虾
 抖音号：987654321
 合作码：KOC-001
 商品ID：3818510027619172445
+商品名称：示例商品
 日预算：300
 出价/ROI目标：ROI 1.2
 转化目标：商品成交
@@ -150,6 +151,73 @@ def assert_cli_flow(script_dir: Path) -> None:
         assert "987654321" in text
         assert "KOC-001" in text
         assert "3818510027619172445" in text
+
+        updated = run_cmd(
+            [
+                sys.executable,
+                str(helper),
+                "--ledger",
+                str(ledger_path),
+                "update-status",
+                "--task-key",
+                task_key,
+                "--status",
+                "PM已完成",
+                "--plan-name",
+                "【WMQ】-0616-钱炸炸-柚子香",
+                "--plan-id",
+                "1868150564460612",
+                "--built-at",
+                "2026-06-16 18:30",
+                "--material-id",
+                "7651944609197326370",
+                "--product-id",
+                "3823114170367345046",
+                "--daily-budget",
+                "300元/日",
+                "--roi-target",
+                "2.7（净成交ROI）",
+                "--smart-coupon",
+                "已开启",
+                "--koc-name",
+                "钱炸炸",
+                "--douyin-id",
+                "7474803",
+                "--product-name",
+                "柚子香",
+                "--plan-status",
+                "计划投放中",
+                "--material-status",
+                "素材审核通过",
+                "--build-source",
+                "人工已搭建好",
+                "--responsible-pm",
+                "测试追投PM",
+            ]
+        )
+        assert updated["status"] == "PM已完成"
+
+        completed_feedback = run_cmd(
+            [
+                sys.executable,
+                str(helper),
+                "--ledger",
+                str(ledger_path),
+                "send-auth-feedback",
+                "--task-key",
+                task_key,
+            ]
+        )
+        completed_text = completed_feedback["dry_run_send"]["text"]
+        assert completed_text.startswith("@测试追投PM\n计划：【WMQ】-0616-钱炸炸-柚子香")
+        assert "计划 ID：1868150564460612" in completed_text
+        assert "素材 ID：7651944609197326370" in completed_text
+        assert "预算：300元/日" in completed_text
+        assert "ROI：2.7（净成交ROI）" in completed_text
+        assert "优惠券：已开启" in completed_text
+        assert "达人：钱炸炸（抖音号：7474803）" in completed_text
+        assert "商品：柚子香（商品ID：3823114170367345046）" in completed_text
+        assert "状态：计划投放中，素材审核通过（人工已搭建好）" in completed_text
 
         minimal = run_cmd(
             [

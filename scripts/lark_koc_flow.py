@@ -246,6 +246,8 @@ def write_group_config(args: argparse.Namespace) -> int:
     }
     if args.responsible_pm:
         group["responsible_pm"] = args.responsible_pm
+    if args.responsible_pm_open_id:
+        group["responsible_pm_open_id"] = args.responsible_pm_open_id
     if args.browser_runtime:
         group["browser_runtime"] = args.browser_runtime
     if args.login_note:
@@ -304,6 +306,8 @@ def register_from_chat(args: argparse.Namespace) -> int:
             "message_id": message.get("message_id") or message.get("id"),
             "customer_account_name": group.get("customer_account_name", ""),
             "customer_account_id": group.get("customer_account_id", ""),
+            "responsible_pm": group.get("responsible_pm", ""),
+            "responsible_pm_open_id": group.get("responsible_pm_open_id", ""),
             "task": task,
             "warnings": result.warnings,
             "created_at": datetime.now(timezone.utc).isoformat(),
@@ -357,6 +361,8 @@ def register_from_text(args: argparse.Namespace) -> int:
         "message_id": args.message_id,
         "customer_account_name": group["customer_account_name"],
         "customer_account_id": group["customer_account_id"],
+        "responsible_pm": group.get("responsible_pm", ""),
+        "responsible_pm_open_id": group.get("responsible_pm_open_id", ""),
         "task": task,
         "warnings": result.warnings,
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -380,9 +386,105 @@ def update_status(args: argparse.Namespace) -> int:
     record["updated_at"] = datetime.now(timezone.utc).isoformat()
     if args.note:
         record.setdefault("notes", []).append({"at": record["updated_at"], "text": args.note})
+    result = record.setdefault("result", {})
+    for key in [
+        "plan_name",
+        "plan_id",
+        "built_at",
+        "material_id",
+        "product_id",
+        "daily_budget",
+        "roi_target",
+        "smart_coupon",
+        "koc_name",
+        "douyin_id",
+        "product_name",
+        "responsible_pm",
+        "responsible_pm_open_id",
+        "plan_status",
+        "material_status",
+        "build_source",
+        "conclusion",
+    ]:
+        value = getattr(args, key)
+        if value:
+            result[key] = value
     save_ledger(ledger_path, ledger)
     print(json.dumps(record, ensure_ascii=False, indent=2))
     return 0
+
+
+def _latest_note(record: dict[str, Any]) -> str:
+    notes = record.get("notes") or []
+    if notes:
+        return notes[-1].get("text", "")
+    return ""
+
+
+def _result_value(record: dict[str, Any], key: str, fallback: str = "未获取到") -> str:
+    task = record.get("task") or {}
+    result = record.get("result") or {}
+    value = result.get(key) or task.get(key)
+    return str(value) if value else fallback
+
+
+def _issue_result_feedback(record: dict[str, Any]) -> str:
+    task = record.get("task") or {}
+    result = record.get("result") or {}
+    status = record.get("status", "")
+    updated_at = str(record.get("updated_at") or "")
+    built_at = result.get("built_at") or updated_at[:19].replace("T", " ") or "未获取到"
+    plan_name = result.get("plan_name") or task.get("plan_name") or "未获取到"
+    product_id = result.get("product_id") or task.get("product_id") or "未获取到"
+    daily_budget = result.get("daily_budget") or task.get("daily_budget") or "未获取到"
+    roi_target = result.get("roi_target") or task.get("bid_or_roi_target") or "未获取到"
+    smart_coupon = result.get("smart_coupon") or task.get("smart_coupon") or "未获取到"
+    koc_name = result.get("koc_name") or task.get("koc_name") or "未获取到"
+    douyin_id = result.get("douyin_id") or task.get("douyin_id") or "未获取到"
+    product_name = result.get("product_name") or task.get("product_name") or "未获取到"
+    responsible_pm = result.get("responsible_pm") or record.get("responsible_pm") or "追投PM未配置"
+    plan_status = result.get("plan_status") or (
+        "计划投放中" if status in {"计划已创建", "已追加素材", "素材已存在", "PM已完成"} else status
+    )
+    material_status = result.get("material_status") or (
+        "素材审核通过" if status in {"素材已存在", "PM已完成"} else "素材状态未获取到"
+    )
+
+    if result.get("build_source"):
+        build_source = result["build_source"]
+    elif status == "PM已完成":
+        build_source = "人工已搭建好"
+    elif status == "素材已存在":
+        build_source = "issue确认已有计划"
+    else:
+        build_source = "issue搭建"
+
+    if result.get("conclusion"):
+        conclusion = result["conclusion"]
+    elif status in {"素材已存在", "PM已完成"}:
+        conclusion = "本次发布链接对应视频已经在计划里，所以没有追加、没有重复建计划。"
+    elif status == "已追加素材":
+        conclusion = "已有同达人/抖音号 + 商品ID计划，本次仅追加素材，没有重复建计划。"
+    elif status == "计划已存在":
+        conclusion = "已找到同达人/抖音号 + 商品ID计划，需要在已有计划里处理素材，不重复新建。"
+    else:
+        conclusion = "未找到同达人/抖音号 + 商品ID计划，本次已新建计划并添加发布链接对应视频。"
+
+    return (
+        f"@{responsible_pm}\n"
+        f"计划：{plan_name}\n"
+        f"计划 ID：{_result_value(record, 'plan_id')}\n"
+        f"搭建好时间：{built_at}\n"
+        f"素材 ID：{_result_value(record, 'material_id')}\n"
+        f"商品 ID：{product_id}\n"
+        f"状态：{plan_status}，{material_status}（{build_source}）\n"
+        f"预算：{daily_budget}\n"
+        f"ROI：{roi_target}\n"
+        f"优惠券：{smart_coupon}\n"
+        f"达人：{koc_name}（抖音号：{douyin_id}）\n"
+        f"商品：{product_name}（商品ID：{product_id}）\n"
+        f"结论：{conclusion}"
+    )
 
 
 def feedback_text(record: dict[str, Any]) -> str:
@@ -403,10 +505,7 @@ def feedback_text(record: dict[str, Any]) -> str:
             f"计划名称：{task.get('plan_name', '')}"
         )
     if status == "等待达人授权":
-        latest_note = ""
-        notes = record.get("notes") or []
-        if notes:
-            latest_note = notes[-1].get("text", "")
+        latest_note = _latest_note(record)
         return (
             "KOC 千川授权待达人处理\n"
             f"客户账户：{record.get('customer_account_name', '')}（{record.get('customer_account_id', '')}）\n"
@@ -419,10 +518,7 @@ def feedback_text(record: dict[str, Any]) -> str:
             "请 @龙虾 的同学推动达人在抖音APP站内信或官方千川账户里确认授权；授权生效后再继续搭建计划。"
         )
     if status == "异常需人工处理":
-        latest_note = ""
-        notes = record.get("notes") or []
-        if notes:
-            latest_note = notes[-1].get("text", "")
+        latest_note = _latest_note(record)
         return (
             "KOC 千川授权异常，需人工处理\n"
             f"客户账户：{record.get('customer_account_name', '')}（{record.get('customer_account_id', '')}）\n"
@@ -433,29 +529,8 @@ def feedback_text(record: dict[str, Any]) -> str:
             f"商品名称：{task.get('product_name', '')}\n"
             f"异常原因：{latest_note or '后台返回异常，请人工确认'}"
         )
-    if status in {"计划已存在", "素材已存在", "已追加素材", "PM已完成"}:
-        latest_note = ""
-        notes = record.get("notes") or []
-        if notes:
-            latest_note = notes[-1].get("text", "")
-        if status in {"素材已存在", "PM已完成"}:
-            conclusion = "当前计划/素材状态已满足投放任务，无需重复发起授权或重复建计划"
-        elif status == "已追加素材":
-            conclusion = "已在已有同达人/抖音号 + 商品ID计划中追加本次KOC素材"
-        else:
-            conclusion = "已找到同达人/抖音号 + 商品ID计划，进入已有计划处理，不重复新建"
-        return (
-            "KOC 千川任务状态已确认\n"
-            f"客户账户：{record.get('customer_account_name', '')}（{record.get('customer_account_id', '')}）\n"
-            f"达人：{koc_name}\n"
-            f"抖音号：{task.get('douyin_id', '')}\n"
-            f"合作码：{task.get('cooperation_code', '')}\n"
-            f"商品ID：{task.get('product_id', '')}\n"
-            f"商品名称：{task.get('product_name', '')}\n"
-            f"当前状态：{status}\n"
-            f"处理结论：{conclusion}\n"
-            f"备注：{latest_note or '已按后台可见计划状态判断'}"
-        )
+    if status in {"计划已存在", "素材已存在", "已追加素材", "PM已完成", "计划已创建"}:
+        return _issue_result_feedback(record)
     return (
         "已发起 KOC 千川授权\n"
         f"客户账户：{record.get('customer_account_name', '')}（{record.get('customer_account_id', '')}）\n"
@@ -499,6 +574,7 @@ def main() -> int:
     cfg.add_argument("--customer-account-name", required=True)
     cfg.add_argument("--customer-account-id", default="")
     cfg.add_argument("--responsible-pm", default="", help="追投 PM who owns the Qianchuan login/permission for this project.")
+    cfg.add_argument("--responsible-pm-open-id", default="", help="Optional Feishu open_id for the responsible PM mention.")
     cfg.add_argument("--browser-runtime", default="", help="Browser-enabled runtime/session name that should operate Qianchuan for this group.")
     cfg.add_argument("--login-note", default="", help="Optional note about first login, Chrome profile, or account permission.")
     cfg.add_argument("--daily-budget", default="")
@@ -537,6 +613,23 @@ def main() -> int:
     upd.add_argument("--task-key", required=True)
     upd.add_argument("--status", required=True)
     upd.add_argument("--note")
+    upd.add_argument("--plan-name", default="")
+    upd.add_argument("--plan-id", default="")
+    upd.add_argument("--built-at", default="")
+    upd.add_argument("--material-id", default="")
+    upd.add_argument("--product-id", default="")
+    upd.add_argument("--daily-budget", default="")
+    upd.add_argument("--roi-target", default="")
+    upd.add_argument("--smart-coupon", default="")
+    upd.add_argument("--koc-name", default="")
+    upd.add_argument("--douyin-id", default="")
+    upd.add_argument("--product-name", default="")
+    upd.add_argument("--responsible-pm", default="")
+    upd.add_argument("--responsible-pm-open-id", default="")
+    upd.add_argument("--plan-status", default="")
+    upd.add_argument("--material-status", default="")
+    upd.add_argument("--build-source", default="", help="issue搭建, 人工已搭建好, or issue确认已有计划.")
+    upd.add_argument("--conclusion", default="")
     upd.set_defaults(func=update_status)
 
     fb = sub.add_parser("send-auth-feedback", help="Send or preview the authorization feedback message.")

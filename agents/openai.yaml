@@ -1,4 +1,4 @@
 interface:
   display_name: "KOC 千川授权"
   short_description: "处理 KOC 千川授权、群反馈和建计划半自动流程。"
-  default_prompt: "Use $koc-qianchuan-authorization to process a project group @部门龙虾 KOC 千川 authorization and plan-building request."
+  default_prompt: "Use $koc-qianchuan-authorization-20260616 to process a project group @部门龙虾 KOC 千川 authorization and plan-building request."
