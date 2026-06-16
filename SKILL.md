@@ -1,9 +1,9 @@
 ---
-name: koc-qianchuan-authorization
-description: Handle KOC 巨量千川 authorization and plan-building workflows for a Feishu project group assistant such as “部门龙虾”. Use when a user needs to process KOC group messages containing 发布链接、抖音号、合作码 and plan parameters, search/select a bound 巨量方舟/巨量千川 customer account, initiate 抖音号授权 and 全域投放授权, send Feishu group feedback, check authorization status, or build a semi-automatic 千川 test/production plan.
+name: koc-qianchuan-authorization-20260616
+description: 2026-06-16 version. Handle KOC 巨量千川 authorization and plan-building workflows for a Feishu project group assistant such as “部门龙虾”. Use when a user needs to process KOC group messages containing 发布链接、抖音号、合作码 and plan parameters, search/select a bound 巨量方舟/巨量千川 customer account, identify existing plans/materials, initiate 抖音号授权 and 全域投放授权 when needed, send Feishu group feedback, check authorization status, or build a semi-automatic 千川 test/production plan.
 ---
 
-# KOC 千川授权
+# KOC 千川授权建计划 - 20260616
 
 ## Workflow
 
