@@ -89,6 +89,7 @@ python3 scripts/lark_koc_flow.py \
 ## Confirmation Policy
 
 - Plan-state lookup: after entering the correct customer account, do this before authorization work. Search for existing same达人/抖音号 + 商品ID plans and confirm whether the current KOC video/material is already present.
+- Plan result verification: after creating a plan, appending material, or finding an existing matching plan, open 【计划详情】 before group feedback. Read back final fields from the detail page, not only from the creation page or plan list.
 - Authorization status lookup: do this when no matching plan exists, or when an existing-plan material append is blocked by authorization. Search both 【抖音号授权】 and 【全域投放授权】 using the KOC达人名称, then 抖音号/ID if needed.
 - Authorization request: may proceed from a valid @龙虾 message only when the matching authorization row is missing or clearly not active. Do not duplicate requests that already show `授权生效`.
 - Feishu feedback: send only to the configured feedback chat.
@@ -108,6 +109,32 @@ After entering the target 千川 customer account, check whether the business ta
 4. If the plan exists but the current素材 is missing, record `计划已存在` and add the KOC video under 【素材】. Only branch to authorization lookup if 千川 blocks the append because authorization is missing/invalid.
 5. If the plan exists but is paused/abnormal or does not clearly match the current达人 + 商品ID, stop and feedback the ambiguity instead of repairing or duplicating the plan.
 6. If no matching plan exists, continue to authorization checks and then build a new plan when authorization is active.
+
+## Plan Detail Verification
+
+Before sending a plan/material completion feedback, the agent must click into 【计划详情】 and verify the final plan state. This applies to all three branches: newly created plan, existing plan with appended material, and PM/already-existing plan.
+
+Required verification:
+
+1. Open the matching plan's detail page from the plan list or success result. Do not close the task from the list row alone.
+2. In 【详情】, verify:
+   - plan name and plan ID
+   - plan status, such as `投放中`
+   - selected达人 / 抖音号
+   - selected商品 / 商品ID
+   - optimization target and ROI target
+   - daily budget
+   -投放日期/投放时段 when visible
+   - smart coupon status
+   - creative/material selection settings, such as 自选投放素材、智能优选素材、AIGC动态创意
+3. In 【素材】, verify:
+   - the current发布链接/video is present
+   - 素材 ID
+   - material review status, such as `审核通过`
+   - material is tied to the expected商品
+4. Use the detail-page values in the group feedback. Do not rely only on the requested values or creation-form values.
+5. If any verified field conflicts with the trigger message or group preset, stop and feedback `异常需人工处理`; do not say the task is closed.
+6. If a field is not visible after checking the relevant detail tab, keep the field in the feedback and write `未获取到，需PM复核`.
 
 ## Authorization Status Branching
 
@@ -164,7 +191,7 @@ Stop and report `异常需人工处理` when:
 
 ## Required Issue Feedback Format
 
-When reporting any plan/material result back to the project group, first @ the responsible 追投 PM from the group preset, then use this exact field order. Do not replace it with a long narrative. Fill unknown values with `未获取到` only when the backend does not expose the field after a reasonable check.
+When reporting any plan/material result back to the project group, first @ the responsible 追投 PM from the group preset, then use this exact field order. Do not replace it with a long narrative. Fill these fields from the plan detail page after clicking 【计划详情】. Fill unknown values with `未获取到，需PM复核` only when the detail page does not expose the field after a reasonable check.
 
 ```text
 @{responsible_pm}
@@ -194,11 +221,11 @@ Field rules:
   - `issue搭建` when 龙虾/司南 created the plan or appended the material during this task.
   - `人工已搭建好` when a PM had already created the plan/material before 龙虾/司南 operated.
   - `issue确认已有计划` when 龙虾/司南 only verified an existing plan and did not change it.
-- `预算`: the visible daily budget in 千川, not only the requested budget.
-- `ROI`: the visible ROI target in 千川, not only the requested ROI.
-- `优惠券`: the visible smart coupon status. If the project policy disallows coupons but the plan shows coupons enabled, stop and report `异常需人工处理` instead of closing.
-- `达人`: the matched KOC达人 and 抖音号/ID. If the visible plan达人 differs from the trigger message, stop and report ambiguity.
-- `商品`: the matched product name and product ID. If the visible plan商品 differs from the trigger 商品ID, stop and report ambiguity.
+- `预算`: the visible daily budget read from 【计划详情】, not only the requested budget.
+- `ROI`: the visible ROI target read from 【计划详情】, not only the requested ROI.
+- `优惠券`: the visible smart coupon status read from 【计划详情】. If the project policy disallows coupons but the plan shows coupons enabled, stop and report `异常需人工处理` instead of closing.
+- `达人`: the matched KOC达人 and 抖音号/ID read from 【计划详情】. If the visible plan达人 differs from the trigger message, stop and report ambiguity.
+- `商品`: the matched product name and product ID read from 【计划详情】. If the visible plan商品 differs from the trigger 商品ID, stop and report ambiguity.
 - `结论`: summarize the business closure. Examples:
   - `本次发布链接对应视频已经在计划里，所以没有追加、没有重复建计划。`
   - `已有同达人/抖音号 + 商品ID计划，本次仅追加素材，没有重复建计划。`
