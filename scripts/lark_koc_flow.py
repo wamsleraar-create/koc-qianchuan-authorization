@@ -25,6 +25,10 @@ STATUSES = {
     "已发起全域投放授权",
     "等待达人授权",
     "授权通过",
+    "计划已存在",
+    "素材已存在",
+    "已追加素材",
+    "PM已完成",
     "计划已创建",
     "异常需人工处理",
 }
@@ -428,6 +432,29 @@ def feedback_text(record: dict[str, Any]) -> str:
             f"商品ID：{task.get('product_id', '')}\n"
             f"商品名称：{task.get('product_name', '')}\n"
             f"异常原因：{latest_note or '后台返回异常，请人工确认'}"
+        )
+    if status in {"计划已存在", "素材已存在", "已追加素材", "PM已完成"}:
+        latest_note = ""
+        notes = record.get("notes") or []
+        if notes:
+            latest_note = notes[-1].get("text", "")
+        if status in {"素材已存在", "PM已完成"}:
+            conclusion = "当前计划/素材状态已满足投放任务，无需重复发起授权或重复建计划"
+        elif status == "已追加素材":
+            conclusion = "已在已有同达人/抖音号 + 商品ID计划中追加本次KOC素材"
+        else:
+            conclusion = "已找到同达人/抖音号 + 商品ID计划，进入已有计划处理，不重复新建"
+        return (
+            "KOC 千川任务状态已确认\n"
+            f"客户账户：{record.get('customer_account_name', '')}（{record.get('customer_account_id', '')}）\n"
+            f"达人：{koc_name}\n"
+            f"抖音号：{task.get('douyin_id', '')}\n"
+            f"合作码：{task.get('cooperation_code', '')}\n"
+            f"商品ID：{task.get('product_id', '')}\n"
+            f"商品名称：{task.get('product_name', '')}\n"
+            f"当前状态：{status}\n"
+            f"处理结论：{conclusion}\n"
+            f"备注：{latest_note or '已按后台可见计划状态判断'}"
         )
     return (
         "已发起 KOC 千川授权\n"

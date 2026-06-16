@@ -18,19 +18,25 @@ Use this skill for the semi-automatic “部门龙虾” flow in KOC project gro
 4. Open 巨量方舟 / 巨量千川 from `https://agent.oceanengine.com/admin/optimizeModule/qianchuan/promotion/domain/roi2-adv` with the user's current Chrome login state. First-time login for a project must be completed by the responsible 追投 PM; the skill only reuses an already-authenticated browser session. Prefer the Chrome plugin for live backend operations. Use `scripts/qianchuan_flow.py` only as a Playwright fallback when a separate browser profile is acceptable.
    - If the current runtime has no controllable Chrome/browser connector, do not claim the workflow can operate 千川 directly. Switch to manual-assist mode: parse the task, apply group presets, report the exact authorization/plan-building checklist, and ask for the PM to run it in a browser-enabled runtime.
    - If a group is assigned to a different 追投 PM than the current browser login, stop before backend operation and ask that PM to open/login from the assigned runtime. Do not operate a project through another PM's 千川 login unless the user explicitly confirms that account has the correct permission.
-5. Before initiating any new authorization, search the target 千川 account's 【抖音号授权】 and 【全域投放授权】 lists by KOC达人名称 first; if needed also search by 抖音号/ID. Prefer exact matches on达人名称 + 抖音号.
-6. Read the visible authorization status for both rows:
+5. After entering the target customer account, perform plan-state triage before initiating any authorization work:
+   - Search existing 商品全域投放 / 全域推商品 plans by the KOC达人名称, 抖音号/账号UID, 商品ID, 商品名称, and expected plan-name pattern when available.
+   - If an exact same达人/抖音号 + 商品ID plan already exists and the current发布链接/视频素材 is already in that plan, record `素材已存在` or `PM已完成`, then send group feedback and stop. Do not check or initiate authorization again.
+   - If an exact same达人/抖音号 + 商品ID plan already exists but the current发布链接/视频素材 is missing, record `计划已存在`, then add the new KOC video under the existing plan's 【素材】. Only check authorization if the page blocks the material append or shows an authorization-related error.
+   - If a PM has already created the correct plan and it is active/valid, do not rebuild it. Feedback the visible plan status, plan name/ID, 商品ID, and whether the current素材 is present.
+   - If no matching plan exists, continue to authorization status checks before creating a new plan.
+6. Before initiating any new authorization, search the target 千川 account's 【抖音号授权】 and 【全域投放授权】 lists by KOC达人名称 first; if needed also search by 抖音号/ID. Prefer exact matches on达人名称 + 抖音号.
+7. Read the visible authorization status for both rows:
    - If 【抖音号授权】 and 【全域投放授权】 both show `授权生效`, record `授权通过` and go directly to plan building.
    - If either row shows waiting/pending text such as `等待达人通过`, `待处理`, `待确认`, `审核中`, or `申请中`, record `等待达人授权` and send group feedback reminding the colleague who @龙虾 to push the达人完成授权确认.
    - If either authorization row is missing, initiate only the missing authorization. Do not duplicate an authorization that already shows `授权生效`.
-7. For KOC视频带货, 全域投放授权 must use `商品全域投放权限` / `全域投放-商品投放`, not直播权限.
-8. Send group feedback after status is known: authorized and entering plan, waiting for达人, newly initiated, or abnormal.
-9. In the plan builder, click 【投放商品】 / 【添加商品】 and search/select by `商品ID` before filling budget/ROI. A brand can have multiple products, so do not infer the product from the brand/account alone.
-10. If 千川 says `当前商品在该抖音号下已存在全域推商品-控成本投放计划`, do not create a duplicate plan. Open 【查看计划详情】, switch to 【素材】, and use 【添加视频】 to append the new KOC video as 自选投放素材 to the existing plan.
-11. For KOC video-commerce plans, use 【自选投放素材】 when material selection is required; do not rely only on default intelligent material selection if the workflow asks for the KOC video asset. Search by the Douyin share link. If 千川 reports that the homepage video's cart product does not match the selected product ID, stop and feedback that the 商品ID is likely wrong.
-12. Treat 【智能优惠券】 as a project/brand policy setting. It is allowed for the current 得宝 KOC test project, but other brands must not have coupons enabled unless the group config or message explicitly allows it. If 千川 defaults coupons on and the project policy is unknown or disallows coupons, stop before submission and feedback for confirmation.
-13. Plan name convention comes from the project/group preset. A common template is `【{bidder_initials}】-{mmdd}-{koc_name}-{product_name}`. `WMQ` is only a test/project example, not a fixed default.
-14. Before final plan submission, summarize account, 抖音号, 合作码, 商品ID, 商品名称, 发布链接, budget, bid/ROI, conversion goal, schedule, audience, asset rule, coupon policy, and plan name. In production, wait for group confirmation; in an explicitly approved test run, pass the submit flag.
+8. For KOC视频带货, 全域投放授权 must use `商品全域投放权限` / `全域投放-商品投放`, not直播权限.
+9. Send group feedback after status is known: plan/material already complete, authorized and entering plan, waiting for达人, newly initiated, or abnormal.
+10. In the plan builder, click 【投放商品】 / 【添加商品】 and search/select by `商品ID` before filling budget/ROI. A brand can have multiple products, so do not infer the product from the brand/account alone.
+11. If 千川 says `当前商品在该抖音号下已存在全域推商品-控成本投放计划`, do not create a duplicate plan. Open 【查看计划详情】, switch to 【素材】, and use 【添加视频】 to append the new KOC video as 自选投放素材 to the existing plan.
+12. For KOC video-commerce plans, use 【自选投放素材】 when material selection is required; do not rely only on default intelligent material selection if the workflow asks for the KOC video asset. Search by the Douyin share link. If 千川 reports that the homepage video's cart product does not match the selected product ID, stop and feedback that the 商品ID is likely wrong.
+13. Treat 【智能优惠券】 as a project/brand policy setting. It is allowed for the current 得宝 KOC test project, but other brands must not have coupons enabled unless the group config or message explicitly allows it. If 千川 defaults coupons on and the project policy is unknown or disallows coupons, stop before submission and feedback for confirmation.
+14. Plan name convention comes from the project/group preset. A common template is `【{bidder_initials}】-{mmdd}-{koc_name}-{product_name}`. `WMQ` is only a test/project example, not a fixed default.
+15. Before final plan submission, summarize account, 抖音号, 合作码, 商品ID, 商品名称, 发布链接, budget, bid/ROI, conversion goal, schedule, audience, asset rule, coupon policy, and plan name. In production, wait for group confirmation; in an explicitly approved test run, pass the submit flag.
 
 ## Message Contract
 
@@ -96,6 +102,10 @@ Record each KOC task in the ledger with one of these statuses:
 - `已发起全域投放授权`
 - `等待达人授权`
 - `授权通过`
+- `计划已存在`
+- `素材已存在`
+- `已追加素材`
+- `PM已完成`
 - `计划已创建`
 - `异常需人工处理`
 
@@ -105,6 +115,7 @@ Use `references/runbook.md` for operator rules, confirmation points, and known s
 
 - Never choose among multiple customer accounts silently.
 - Never submit a plan unless the user has explicitly approved submission for that run or a group confirmation has been captured.
+- Never force the task through authorization or plan creation when an existing matching plan/material state already closes the business request. Report the visible state and stop.
 - Never send feedback to a real business group during testing unless the target chat is explicitly configured.
 - Treat CAPTCHA, SMS, password, and扫码 steps as user-handled.
 - First-time 巨量方舟/千川 login must be performed by the responsible project 追投 PM. Do not bypass login security; resume only after the browser is already inside 千川.

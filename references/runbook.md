@@ -88,14 +88,30 @@ python3 scripts/lark_koc_flow.py \
 
 ## Confirmation Policy
 
-- Authorization status lookup: always do this first in both 【抖音号授权】 and 【全域投放授权】 using the KOC达人名称, then 抖音号/ID if needed.
+- Plan-state lookup: after entering the correct customer account, do this before authorization work. Search for existing same达人/抖音号 + 商品ID plans and confirm whether the current KOC video/material is already present.
+- Authorization status lookup: do this when no matching plan exists, or when an existing-plan material append is blocked by authorization. Search both 【抖音号授权】 and 【全域投放授权】 using the KOC达人名称, then 抖音号/ID if needed.
 - Authorization request: may proceed from a valid @龙虾 message only when the matching authorization row is missing or clearly not active. Do not duplicate requests that already show `授权生效`.
 - Feishu feedback: send only to the configured feedback chat.
 - Plan submit: production requires group confirmation. Test runs can pass the submit flag only after the user explicitly allows it.
 
+## Plan-State Triage
+
+After entering the target 千川 customer account, check whether the business task is already closed before doing authorization work:
+
+1. Search 商品全域投放 / 全域推商品 plans by KOC达人名称、抖音号/账号UID、商品ID、商品名称、计划名 pattern.
+2. If an exact same达人/抖音号 + 商品ID plan exists, open the plan detail and check:
+   - plan name and ID
+   - plan status, such as 投放中、暂停、审核中、异常
+   - budget/ROI when visible
+   - whether the current发布链接/视频素材 is already present under 【素材】
+3. If the plan exists and the current素材 is already present, record `素材已存在` or `PM已完成`, feedback the visible plan state, and stop. Do not check authorization or create anything else.
+4. If the plan exists but the current素材 is missing, record `计划已存在` and add the KOC video under 【素材】. Only branch to authorization lookup if 千川 blocks the append because authorization is missing/invalid.
+5. If the plan exists but is paused/abnormal or does not clearly match the current达人 + 商品ID, stop and feedback the ambiguity instead of repairing or duplicating the plan.
+6. If no matching plan exists, continue to authorization checks and then build a new plan when authorization is active.
+
 ## Authorization Status Branching
 
-Search the target 千川 account before initiating authorization:
+Search the target 千川 account before initiating authorization only after plan-state triage indicates that a new plan is needed or an append is blocked:
 
 1. 【抖音号授权】: search KOC达人名称 first; if no exact match, search 抖音号/ID.
 2. 【全域投放授权】: search KOC达人名称 first; if no exact match, search 抖音号/ID. For KOC视频带货, the required permission is `商品全域投放` / `商品全域投放权限`.
@@ -121,6 +137,7 @@ Search the target 千川 account before initiating authorization:
 
 - Each project group can remember a default `商品ID`; if the trigger message omits `商品ID`, use the group memory only when it is unambiguous. Otherwise reply with the missing field and stop.
 - A brand can have multiple products. Prefer the `商品ID` and `商品名称` provided in the trigger message for each KOC post; do not infer product solely from the customer account or brand.
+- Before creating a new plan, confirm that no exact same达人/抖音号 + 商品ID plan already exists. If PM has already built it correctly, close the task with a status feedback instead of rebuilding.
 - In 【竞价投放】 -> 【全域投放】 -> 【推商品】, click 【投放商品】 / 【添加商品】 and search by `商品ID`.
 - Select the exact product ID match. If the product list does not return that ID, stop and ask for the correct商品ID.
 - If the product row says `当前商品在该抖音号下已存在全域推商品-控成本投放计划`, open 【查看计划详情】 instead of adding the product to a new plan. In the existing plan, switch to 【素材】 -> 【视频】 and click 【添加视频】 to add the current KOC video.
@@ -139,6 +156,8 @@ Stop and report `异常需人工处理` when:
 - The page asks for CAPTCHA, SMS, password, scan code, or other human verification.
 - The expected authorization or plan-building controls are not visible.
 - The required 商品ID is missing or the product drawer cannot find an exact product ID match.
+- A matching plan exists but its status is paused/abnormal/ambiguous and the user has not asked to repair it.
+- The page cannot confirm whether the current发布链接/视频素材 is already in the matching plan.
 - 千川提示发布链接对应视频的挂车商品与所选商品ID不一致。
 - The parsed plan budget or ROI target is inconsistent with the message.
 - 智能优惠券 is enabled while the project/brand policy is unknown or disallows coupons.
@@ -190,4 +209,32 @@ KOC 千川计划已创建
 商品名称：{product_name}
 抖音号：{douyin_id}
 合作码：{cooperation_code}
+```
+
+Plan/material already complete:
+
+```text
+KOC 千川任务已闭环，无需重复操作
+客户账户：{customer_account_name}（{customer_account_id}）
+达人：{koc_name}
+抖音号：{douyin_id}
+商品ID：{product_id}
+商品名称：{product_name}
+计划名称/ID：{plan_name_or_id}
+计划状态：{plan_status}
+素材状态：当前发布链接/视频素材已在计划中
+处理结论：PM已完成 / 素材已存在，不再发起授权或重复建计划
+```
+
+Existing plan, material appended:
+
+```text
+KOC 千川素材已追加到已有计划
+客户账户：{customer_account_name}（{customer_account_id}）
+达人：{koc_name}
+抖音号：{douyin_id}
+商品ID：{product_id}
+商品名称：{product_name}
+计划名称/ID：{plan_name_or_id}
+处理结果：已有同达人/抖音号 + 商品ID计划，本次仅追加素材
 ```
