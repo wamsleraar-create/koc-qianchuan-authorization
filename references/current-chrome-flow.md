@@ -55,7 +55,7 @@ Do not label these as KOC authorization failures. They are runtime/browser block
    - A row shows waiting/pending status such as `等待达人通过`, `待处理`, `待确认`, `审核中`, or `申请中`: update the ledger to `等待达人授权`, send Feishu feedback telling the colleague who @龙虾 to push the达人 confirmation, and stop.
    - A row is missing: initiate only the missing authorization. For 全域投放授权 choose `商品全域投放权限`. After the request is sent, update the ledger to `等待达人授权`, send Feishu feedback telling the content teammate who @龙虾/司南 to push the KOC达人 to approve both authorizations, and stop. Do not continue to plan building in the same run.
 12. Before plan submit, summarize all critical fields. Submit only when the run has explicit user/test approval or captured group confirmation.
-13. If 千川 shows a pre-submit warning such as 商品前置检测 / `当前商品可能审核不通过`, pause and report the warning text. If the user later replies with explicit approval such as `忽略`, `我知道了`, `继续发布计划`, or `发布计划`, rerun Browser Preflight first, re-locate the exact pending plan/draft, then click the warning acknowledgement and continue. If the pending plan state cannot be recovered, rebuild the pre-submit state and ask for confirmation again.
+13. If 千川 shows a dismissible pre-submit warning such as 商品前置检测 / `当前商品可能审核不通过` with a button like `我知道了`, record the warning text, click `我知道了`, and continue automatically. Do not pause only because this warning appears. Stop only when the page shows a hard blocker, such as 商品ID/挂车商品不一致, required fields missing, account/authorization mismatch, no submit button after acknowledgement, or an actual submit failure.
 14. After submit succeeds, click into the created plan's 【计划详情】. Verify from 【详情】: plan name/ID/status, selected达人, selected商品, daily budget, ROI target,投放日期, smart coupon status, and creative settings. Verify from 【素材】: current发布链接/video,素材 ID, and material review status. Use these detail-page values in the group feedback. If anything conflicts with the trigger message or group preset, stop and report `异常需人工处理`.
 
 ## Evidence To Capture
@@ -65,7 +65,7 @@ Do not label these as KOC authorization failures. They are runtime/browser block
 - Visible matching plan row/detail, plan ID/status, and whether the current发布链接/视频素材 is already present.
 - Plan detail page verification after create/append/existing-plan confirmation: 【详情】 values and 【素材】 values.
 - Visible success state or toast for any newly initiated authorization request.
-- Pre-submit warning text and the user/group confirmation that allowed continuing, if any.
+- Pre-submit warning text and whether the warning was automatically acknowledged, if any.
 - Browser preflight result for the direct run and for any comment rerun/resume.
 - Feishu feedback dry-run or sent message result.
 - Authorization status text before building the plan.

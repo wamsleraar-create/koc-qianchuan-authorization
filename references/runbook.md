@@ -100,15 +100,15 @@ python3 scripts/lark_koc_flow.py \
 - Authorization wait gate: after initiating 抖音号授权 or 全域投放授权 for a new/unauthorized KOC达人, stop. Send group feedback telling the content teammate who triggered the task to push the KOC达人 to approve both authorizations. Continue plan building only after a later check confirms both authorization rows are `授权生效`.
 - Feishu feedback: send only to the configured feedback chat.
 - Plan submit: production requires group confirmation. Test runs can pass the submit flag only after the user explicitly allows it.
-- Resume after approval: when a run pauses on a warning and the user replies `继续发布计划`, `我知道了`, `忽略`, or similar, rerun browser preflight and re-locate the pending plan/draft before clicking anything. If the draft cannot be recovered, rebuild the pre-submit state from the task record and ask for confirmation again.
+- Dismissible pre-submit warnings: if 千川 shows 商品前置检测 / `当前商品可能审核不通过` and provides `我知道了` or a similar acknowledgement button, record the warning text, click the acknowledgement, and continue automatically. Do not pause only for this warning. Stop only for hard blockers such as 商品ID/挂车商品不一致, missing required fields, authorization/account mismatch, no submit path after acknowledgement, or submit failure.
 
 ## Runtime And Resume Handling
 
-This workflow commonly spans multiple Multica runs: an initial direct run may stop at a risk prompt, and a later comment rerun may ask the agent to continue. Treat every continuation as a fresh browser-control operation.
+This workflow commonly spans multiple Multica runs. Treat every continuation as a fresh browser-control operation.
 
 Required handling:
 
-1. Read the issue/task record and identify the last business state: plan-state triage, authorization wait, pre-submit warning, published plan, appended material, or completed feedback.
+1. Read the issue/task record and identify the last business state: plan-state triage, authorization wait, published plan, appended material, completed feedback, or a hard blocker. Dismissible warnings should normally be acknowledged and continued in the same run.
 2. Run browser preflight before any 千川 click:
    - current runtime/agent
    - configured `browser_runtime`
@@ -118,7 +118,7 @@ Required handling:
    - visible customer account
    - current page state
 3. If the current Chrome profile differs from the configured profile, stop and record `浏览器Profile不匹配`. Example from JCMA-263: the resumed run fell back to another Chrome profile while the logged-in 千川 account was in `Profile 4`; the correct behavior is to stop and report the runtime blocker, not to open a blank page and continue.
-4. If the prior run stopped at a pre-submit warning, find the same pending plan/draft and verify its visible fields still match the issue. Only then click `我知道了` / `发布计划`.
+4. If the page is currently on a dismissible warning, verify the visible plan fields still match the issue, click `我知道了`, and continue. If the warning is a hard blocker or the fields no longer match, stop and report the blocker.
 5. If the pending plan/draft is gone, do not assume it was submitted. Return to the plan list, search same达人/抖音号 + 商品ID, and decide whether the plan now exists. If not, rebuild to pre-submit and ask for confirmation again.
 6. If a human/Codex operator completes steps after Multica stalls, write exactly which steps were automated and which were manually completed.
 
