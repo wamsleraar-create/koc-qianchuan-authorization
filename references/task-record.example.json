@@ -18,6 +18,35 @@
     "plan_name": "KOC测试-987654321"
   },
   "warnings": [],
+  "runtime": {
+    "run_id": "unknown",
+    "browser_runtime": "该PM已登录的可控浏览器环境名称",
+    "chrome_profile_name": "可选，例如 Profile 4",
+    "chrome_preferences_path": "可选，例如 /Users/xxx/Library/Application Support/Google/Chrome/Profile 4/Preferences",
+    "browser_preflight": "未执行/通过/阻塞原因",
+    "page_state": "account_list/auth_list/plan_list/plan_builder/pre_submit_warning/plan_detail/unknown"
+  },
+  "result": {
+    "business_branch": "等待达人授权/新建计划/追加素材/素材已存在/异常",
+    "authorization_status": {
+      "douyin_account_authorization": "未知",
+      "global_product_authorization": "未知"
+    },
+    "plan_detail_readback": {
+      "plan_name": "未获取到",
+      "plan_id": "未获取到",
+      "daily_budget": "未获取到",
+      "roi_target": "未获取到",
+      "smart_coupon": "未获取到",
+      "material_id": "未获取到",
+      "material_status": "未获取到"
+    },
+    "feedback": {
+      "chat_id": "oc_example_feedback_group",
+      "message_id": "未发送"
+    },
+    "manual_takeover": "无"
+  },
   "created_at": "2026-06-11T00:00:00+00:00",
   "updated_at": "2026-06-11T00:00:00+00:00"
 }

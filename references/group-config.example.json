@@ -6,6 +6,8 @@
       "customer_account_id": "按项目填写客户账户ID",
       "responsible_pm": "负责该项目的追投PM",
       "browser_runtime": "该PM已登录的可控浏览器环境名称",
+      "chrome_profile_name": "可选，例如 Profile 4",
+      "chrome_preferences_path": "可选，例如 /Users/xxx/Library/Application Support/Google/Chrome/Profile 4/Preferences",
       "login_note": "首次由负责PM在该环境登录，验证码/扫码由PM处理",
       "feedback_chat_id": "oc_example_feedback_group",
       "bidder_initials": "按项目填写投手缩写",

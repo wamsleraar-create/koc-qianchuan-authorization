@@ -250,6 +250,10 @@ def write_group_config(args: argparse.Namespace) -> int:
         group["responsible_pm_open_id"] = args.responsible_pm_open_id
     if args.browser_runtime:
         group["browser_runtime"] = args.browser_runtime
+    if args.chrome_profile_name:
+        group["chrome_profile_name"] = args.chrome_profile_name
+    if args.chrome_preferences_path:
+        group["chrome_preferences_path"] = args.chrome_preferences_path
     if args.login_note:
         group["login_note"] = args.login_note
     plan_defaults = {
@@ -308,8 +312,18 @@ def register_from_chat(args: argparse.Namespace) -> int:
             "customer_account_id": group.get("customer_account_id", ""),
             "responsible_pm": group.get("responsible_pm", ""),
             "responsible_pm_open_id": group.get("responsible_pm_open_id", ""),
+            "browser_runtime": group.get("browser_runtime", ""),
+            "chrome_profile_name": group.get("chrome_profile_name", ""),
+            "chrome_preferences_path": group.get("chrome_preferences_path", ""),
             "task": task,
             "warnings": result.warnings,
+            "runtime": {
+                "browser_runtime": group.get("browser_runtime", ""),
+                "chrome_profile_name": group.get("chrome_profile_name", ""),
+                "chrome_preferences_path": group.get("chrome_preferences_path", ""),
+                "browser_preflight": "未执行",
+                "page_state": "unknown",
+            },
             "created_at": datetime.now(timezone.utc).isoformat(),
             "updated_at": datetime.now(timezone.utc).isoformat(),
         }
@@ -363,8 +377,18 @@ def register_from_text(args: argparse.Namespace) -> int:
         "customer_account_id": group["customer_account_id"],
         "responsible_pm": group.get("responsible_pm", ""),
         "responsible_pm_open_id": group.get("responsible_pm_open_id", ""),
+        "browser_runtime": group.get("browser_runtime", ""),
+        "chrome_profile_name": group.get("chrome_profile_name", ""),
+        "chrome_preferences_path": group.get("chrome_preferences_path", ""),
         "task": task,
         "warnings": result.warnings,
+        "runtime": {
+            "browser_runtime": group.get("browser_runtime", ""),
+            "chrome_profile_name": group.get("chrome_profile_name", ""),
+            "chrome_preferences_path": group.get("chrome_preferences_path", ""),
+            "browser_preflight": "未执行",
+            "page_state": "unknown",
+        },
         "created_at": datetime.now(timezone.utc).isoformat(),
         "updated_at": datetime.now(timezone.utc).isoformat(),
     }
@@ -387,6 +411,18 @@ def update_status(args: argparse.Namespace) -> int:
     if args.note:
         record.setdefault("notes", []).append({"at": record["updated_at"], "text": args.note})
     result = record.setdefault("result", {})
+    runtime = record.setdefault("runtime", {})
+    for key in [
+        "run_id",
+        "browser_runtime",
+        "chrome_profile_name",
+        "chrome_preferences_path",
+        "browser_preflight",
+        "page_state",
+    ]:
+        value = getattr(args, key)
+        if value:
+            runtime[key] = value
     for key in [
         "plan_name",
         "plan_id",
@@ -405,6 +441,10 @@ def update_status(args: argparse.Namespace) -> int:
         "material_status",
         "build_source",
         "conclusion",
+        "business_branch",
+        "feedback_message_id",
+        "feedback_chat_id",
+        "manual_takeover",
     ]:
         value = getattr(args, key)
         if value:
@@ -586,6 +626,8 @@ def main() -> int:
     cfg.add_argument("--responsible-pm", default="", help="追投 PM who owns the Qianchuan login/permission for this project.")
     cfg.add_argument("--responsible-pm-open-id", default="", help="Optional Feishu open_id for the responsible PM mention.")
     cfg.add_argument("--browser-runtime", default="", help="Browser-enabled runtime/session name that should operate Qianchuan for this group.")
+    cfg.add_argument("--chrome-profile-name", default="", help="Optional expected Chrome profile name, for example Profile 4.")
+    cfg.add_argument("--chrome-preferences-path", default="", help="Optional path to the expected Chrome profile Preferences file.")
     cfg.add_argument("--login-note", default="", help="Optional note about first login, Chrome profile, or account permission.")
     cfg.add_argument("--daily-budget", default="")
     cfg.add_argument("--roi-target", default="")
@@ -636,10 +678,20 @@ def main() -> int:
     upd.add_argument("--product-name", default="")
     upd.add_argument("--responsible-pm", default="")
     upd.add_argument("--responsible-pm-open-id", default="")
+    upd.add_argument("--run-id", default="")
+    upd.add_argument("--browser-runtime", default="")
+    upd.add_argument("--chrome-profile-name", default="")
+    upd.add_argument("--chrome-preferences-path", default="")
+    upd.add_argument("--browser-preflight", default="")
+    upd.add_argument("--page-state", default="")
     upd.add_argument("--plan-status", default="")
     upd.add_argument("--material-status", default="")
     upd.add_argument("--build-source", default="", help="issue搭建, 人工已搭建好, or issue确认已有计划.")
     upd.add_argument("--conclusion", default="")
+    upd.add_argument("--business-branch", default="")
+    upd.add_argument("--feedback-message-id", default="")
+    upd.add_argument("--feedback-chat-id", default="")
+    upd.add_argument("--manual-takeover", default="")
     upd.set_defaults(func=update_status)
 
     fb = sub.add_parser("send-auth-feedback", help="Send or preview the authorization feedback message.")

@@ -32,6 +32,8 @@ The JSON shape is:
       "customer_account_id": "123456789",
       "responsible_pm": "负责该项目的追投PM",
       "browser_runtime": "该PM已登录的可控浏览器环境名称",
+      "chrome_profile_name": "可选，例如 Profile 4",
+      "chrome_preferences_path": "可选，例如 /Users/xxx/Library/Application Support/Google/Chrome/Profile 4/Preferences",
       "login_note": "首次由负责PM在该环境登录，验证码/扫码由PM处理",
       "feedback_chat_id": "oc_xxx"
     }
@@ -46,6 +48,8 @@ For new KOC project groups, configure project defaults before content teammates 
 - `customer_account_name` / `customer_account_id`
 - `responsible_pm`
 - `browser_runtime`
+- `chrome_profile_name`
+- `chrome_preferences_path`
 - `login_note`
 - `daily_budget`
 - `bid_or_roi_target`
@@ -88,6 +92,7 @@ python3 scripts/lark_koc_flow.py \
 
 ## Confirmation Policy
 
+- Browser preflight: required before every direct 千川 operation and before every Multica comment rerun/resume. Check the configured runtime/profile, Chrome connector, logged-in 千川 tab, customer account, and current page state. If any browser condition fails, stop with a runtime blocker; do not continue as if it were an authorization or plan-building problem.
 - Plan-state lookup: after entering the correct customer account, do this before authorization work. Search for existing same达人/抖音号 + 商品ID plans and confirm whether the current KOC video/material is already present.
 - Plan result verification: after creating a plan, appending material, or finding an existing matching plan, open 【计划详情】 before group feedback. Read back final fields from the detail page, not only from the creation page or plan list.
 - Authorization status lookup: do this when no matching plan exists, or when an existing-plan material append is blocked by authorization. Search both 【抖音号授权】 and 【全域投放授权】 using the KOC达人名称, then 抖音号/ID if needed.
@@ -95,6 +100,41 @@ python3 scripts/lark_koc_flow.py \
 - Authorization wait gate: after initiating 抖音号授权 or 全域投放授权 for a new/unauthorized KOC达人, stop. Send group feedback telling the content teammate who triggered the task to push the KOC达人 to approve both authorizations. Continue plan building only after a later check confirms both authorization rows are `授权生效`.
 - Feishu feedback: send only to the configured feedback chat.
 - Plan submit: production requires group confirmation. Test runs can pass the submit flag only after the user explicitly allows it.
+- Resume after approval: when a run pauses on a warning and the user replies `继续发布计划`, `我知道了`, `忽略`, or similar, rerun browser preflight and re-locate the pending plan/draft before clicking anything. If the draft cannot be recovered, rebuild the pre-submit state from the task record and ask for confirmation again.
+
+## Runtime And Resume Handling
+
+This workflow commonly spans multiple Multica runs: an initial direct run may stop at a risk prompt, and a later comment rerun may ask the agent to continue. Treat every continuation as a fresh browser-control operation.
+
+Required handling:
+
+1. Read the issue/task record and identify the last business state: plan-state triage, authorization wait, pre-submit warning, published plan, appended material, or completed feedback.
+2. Run browser preflight before any 千川 click:
+   - current runtime/agent
+   - configured `browser_runtime`
+   - configured `chrome_profile_name` / `chrome_preferences_path`
+   - Chrome connector availability
+   - visible 千川 domain/login state
+   - visible customer account
+   - current page state
+3. If the current Chrome profile differs from the configured profile, stop and record `浏览器Profile不匹配`. Example from JCMA-263: the resumed run fell back to another Chrome profile while the logged-in 千川 account was in `Profile 4`; the correct behavior is to stop and report the runtime blocker, not to open a blank page and continue.
+4. If the prior run stopped at a pre-submit warning, find the same pending plan/draft and verify its visible fields still match the issue. Only then click `我知道了` / `发布计划`.
+5. If the pending plan/draft is gone, do not assume it was submitted. Return to the plan list, search same达人/抖音号 + 商品ID, and decide whether the plan now exists. If not, rebuild to pre-submit and ask for confirmation again.
+6. If a human/Codex operator completes steps after Multica stalls, write exactly which steps were automated and which were manually completed.
+
+Required issue recap after every run:
+
+```text
+执行复盘：
+Run ID：{run_id_or_unknown}
+Runtime/Profile：{runtime} / {chrome_profile_or_unknown}
+Browser preflight：{passed_or_blocked_reason}
+业务分支：{已有计划素材已存在/已有计划追加素材/新建计划/等待达人授权/异常}
+授权状态：抖音号授权={status}；全域投放授权={status}
+计划详情回读：{plan_name} / {plan_id} / {budget} / {roi} / {coupon} / {material_id}
+群反馈：{feedback_chat_or_group} / {message_id_or_not_sent}
+人工接管：{无/有，说明接管步骤和原因}
+```
 
 ## Plan-State Triage
 
