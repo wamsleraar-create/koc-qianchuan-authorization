@@ -92,6 +92,7 @@ python3 scripts/lark_koc_flow.py \
 - Plan result verification: after creating a plan, appending material, or finding an existing matching plan, open 【计划详情】 before group feedback. Read back final fields from the detail page, not only from the creation page or plan list.
 - Authorization status lookup: do this when no matching plan exists, or when an existing-plan material append is blocked by authorization. Search both 【抖音号授权】 and 【全域投放授权】 using the KOC达人名称, then 抖音号/ID if needed.
 - Authorization request: may proceed from a valid @龙虾 message only when the matching authorization row is missing or clearly not active. Do not duplicate requests that already show `授权生效`.
+- Authorization wait gate: after initiating 抖音号授权 or 全域投放授权 for a new/unauthorized KOC达人, stop. Send group feedback telling the content teammate who triggered the task to push the KOC达人 to approve both authorizations. Continue plan building only after a later check confirms both authorization rows are `授权生效`.
 - Feishu feedback: send only to the configured feedback chat.
 - Plan submit: production requires group confirmation. Test runs can pass the submit flag only after the user explicitly allows it.
 
@@ -145,6 +146,8 @@ Search the target 千川 account before initiating authorization only after plan
 3. If both rows show `授权生效`, set the ledger status to `授权通过` and continue directly to plan building.
 4. If either row shows `等待达人通过`, `待处理`, `待确认`, `审核中`, `申请中`, or similar pending text, set the ledger status to `等待达人授权`, send a group reminder, and stop until the达人 confirms.
 5. If a required row is missing, initiate only that missing authorization. For 全域投放授权, select `商品全域投放权限`.
+6. After initiating any missing authorization, set the task to `等待达人授权`, send feedback to the project group, and stop. The feedback must tell the content teammate who @龙虾/司南 to push the KOC达人 to approve both 【抖音号授权】 and 【全域投放授权】 in Douyin/official 千川 confirmation channels.
+7. Do not build or submit a plan while either authorization is pending, even if the authorization request was successfully sent. Resume only after rechecking and seeing both rows as `授权生效`.
 
 ## Browser Selection
 
@@ -280,10 +283,13 @@ Authorization initiated:
 ```text
 已发起 KOC 千川授权
 客户账户：{customer_account_name}（{customer_account_id}）
+内容同学：请推动 KOC 达人完成授权确认
 抖音号：{douyin_id}
 合作码：{cooperation_code}
 发布链接：{publish_link}
-状态：已发起抖音号授权 + 全域投放授权，等待达人授权通过
+已发起授权：{initiated_authorizations}
+当前状态：等待达人通过授权
+下一步：达人通过【抖音号授权】和【全域投放授权】后，龙虾/司南才能继续检查并搭建计划。
 ```
 
 Plan created:

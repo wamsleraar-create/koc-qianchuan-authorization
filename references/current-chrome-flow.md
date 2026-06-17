@@ -30,7 +30,7 @@ Use this path when the user says the 巨量方舟 / 千川 session is already lo
 11. Branch from visible authorization status:
    - Both rows show `授权生效`: update the ledger to `授权通过` and go directly to plan building.
    - A row shows waiting/pending status such as `等待达人通过`, `待处理`, `待确认`, `审核中`, or `申请中`: update the ledger to `等待达人授权`, send Feishu feedback telling the colleague who @龙虾 to push the达人 confirmation, and stop.
-   - A row is missing: initiate only the missing authorization. For 全域投放授权 choose `商品全域投放权限`, then send feedback based on the submit result.
+   - A row is missing: initiate only the missing authorization. For 全域投放授权 choose `商品全域投放权限`. After the request is sent, update the ledger to `等待达人授权`, send Feishu feedback telling the content teammate who @龙虾/司南 to push the KOC达人 to approve both authorizations, and stop. Do not continue to plan building in the same run.
 12. Before plan submit, summarize all critical fields. Submit only when the run has explicit user/test approval or captured group confirmation.
 13. After submit succeeds, click into the created plan's 【计划详情】. Verify from 【详情】: plan name/ID/status, selected达人, selected商品, daily budget, ROI target,投放日期, smart coupon status, and creative settings. Verify from 【素材】: current发布链接/video,素材 ID, and material review status. Use these detail-page values in the group feedback. If anything conflicts with the trigger message or group preset, stop and report `异常需人工处理`.
 

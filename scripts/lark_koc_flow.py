@@ -509,13 +509,14 @@ def feedback_text(record: dict[str, Any]) -> str:
         return (
             "KOC 千川授权待达人处理\n"
             f"客户账户：{record.get('customer_account_name', '')}（{record.get('customer_account_id', '')}）\n"
+            "内容同学：请推动 KOC 达人完成授权确认\n"
             f"达人：{koc_name}\n"
             f"抖音号：{task.get('douyin_id', '')}\n"
             f"合作码：{task.get('cooperation_code', '')}\n"
             f"商品ID：{task.get('product_id', '')}\n"
             f"商品名称：{task.get('product_name', '')}\n"
             f"当前状态：{latest_note or '等待达人通过授权'}\n"
-            "请 @龙虾 的同学推动达人在抖音APP站内信或官方千川账户里确认授权；授权生效后再继续搭建计划。"
+            "请 @龙虾/司南 的内容同学推动达人在抖音APP站内信或官方千川账户里确认【抖音号授权】和【全域投放授权】；两项授权都生效后，才能继续计划搭建。"
         )
     if status == "异常需人工处理":
         latest_note = _latest_note(record)
@@ -531,9 +532,16 @@ def feedback_text(record: dict[str, Any]) -> str:
         )
     if status in {"计划已存在", "素材已存在", "已追加素材", "PM已完成", "计划已创建"}:
         return _issue_result_feedback(record)
+    if status == "已发起抖音号授权":
+        initiated = "抖音号授权"
+    elif status == "已发起全域投放授权":
+        initiated = "全域投放授权"
+    else:
+        initiated = "抖音号授权 + 全域投放授权"
     return (
         "已发起 KOC 千川授权\n"
         f"客户账户：{record.get('customer_account_name', '')}（{record.get('customer_account_id', '')}）\n"
+        "内容同学：请推动 KOC 达人完成授权确认\n"
         f"达人：{koc_name}\n"
         f"抖音号：{task.get('douyin_id', '')}\n"
         f"合作码：{task.get('cooperation_code', '')}\n"
@@ -541,7 +549,9 @@ def feedback_text(record: dict[str, Any]) -> str:
         f"商品名称：{task.get('product_name', '')}\n"
         f"智能优惠券：{task.get('smart_coupon', '按项目配置')}\n"
         f"发布链接：{task.get('publish_link', '')}\n"
-        "状态：已发起抖音号授权 + 全域投放授权，等待达人授权通过"
+        f"已发起授权：{initiated}\n"
+        "当前状态：等待达人通过授权\n"
+        "下一步：达人通过【抖音号授权】和【全域投放授权】后，龙虾/司南才能继续检查并搭建计划。"
     )
 
 
