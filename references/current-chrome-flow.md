@@ -42,12 +42,13 @@ Do not label these as KOC authorization failures. They are runtime/browser block
 4. If the page is not already logged in, stop and ask the responsible project 追投 PM to complete login; continue only after 千川 is open.
 5. Use the page's 【客户账户】 search with `customer_account_id` first; if missing, search `customer_account_name`.
 6. If one exact match is visible, enter it. If there are zero or multiple plausible matches, stop.
-7. Before authorization work, search existing 商品全域投放 / 全域推商品 plans by达人名称、抖音号/账号UID、商品ID、商品名称、计划名 pattern. Capture any exact same达人/抖音号 + 商品ID plan and its visible status.
+7. Before authorization work, search existing 商品全域投放 / 全域推商品 plans by达人名称、抖音号/账号UID、商品ID、商品名称、计划名 pattern. Capture any exact same达人/抖音号 + 商品ID plan and its visible status. Also capture whether the same达人/抖音号 already has another active/valid 商品全域投放 / 全域推商品 plan under a different商品 in the same account.
 8. Branch from visible plan/material state:
    - Matching plan exists and the current发布链接/视频素材 is already present: update the ledger to `素材已存在` or `PM已完成`, open 【计划详情】, verify 【详情】 and 【素材】 fields, send group feedback with detail-page values, and stop.
    - Matching plan exists but current素材 is missing: update the ledger to `计划已存在`, open the plan detail, switch to 【素材】, and add the KOC video. Only check authorization if the append flow is blocked by an authorization error. After appending, stay in/open 【计划详情】 and verify final 【详情】 and 【素材】 fields before feedback.
    - Matching plan exists but status is paused/error/ambiguous: feedback the visible plan status and stop for PM confirmation unless the user explicitly asks to repair it.
-   - No matching plan exists: continue to authorization checks before creating a new plan.
+   - No same商品ID matching plan exists, but same达人 has another active/valid 商品全域 plan in this account: treat the达人 authorization as already proven for this account, skip 【抖音号授权】 and 【全域投放授权】 checks, go directly to 【投放商品】 / 【添加商品】, select the new商品 by exact商品ID, and build the new商品 plan. Only return to authorization checks if 千川 explicitly blocks the new商品 flow with an authorization error.
+   - No matching same商品ID plan and no same达人 historical active/valid 商品全域 plan exists: continue to authorization checks before creating a new plan.
 9. Navigate to 【抖音号授权】 and search the KOC达人名称 first. If the row is not found, search by 抖音号/ID. Capture the matched达人名称、抖音号、授权类型、授权状态、授权时间.
 10. Navigate to 【全域投放授权】, switch to 【非官方抖音号授权管理】 when applicable, and search the same KOC达人名称 first. If the row is not found, search by 抖音号/ID. For KOC视频带货, only treat `商品全域投放` / `商品全域投放权限` as the correct permission.
 11. Branch from visible authorization status:

@@ -1,5 +1,5 @@
 ---
-name: koc-qianchuan-authorization-20260616
+name: deepminer-koc-qianchuan-authorization-20260616
 description: 2026-06-16 version. Handle KOC 巨量千川 authorization and plan-building workflows for a Feishu project group assistant such as “部门龙虾”. Use when a user needs to process KOC group messages containing 发布链接、抖音号、合作码 and plan parameters, search/select a bound 巨量方舟/巨量千川 customer account, identify existing plans/materials, initiate 抖音号授权 and 全域投放授权 when needed, send Feishu group feedback, check authorization status, or build a semi-automatic 千川 test/production plan.
 ---
 
@@ -27,7 +27,8 @@ Use this skill for the semi-automatic “部门龙虾” flow in KOC project gro
    - If an exact same达人/抖音号 + 商品ID plan already exists and the current发布链接/视频素材 is already in that plan, record `素材已存在` or `PM已完成`, then send group feedback and stop. Do not check or initiate authorization again.
    - If an exact same达人/抖音号 + 商品ID plan already exists but the current发布链接/视频素材 is missing, record `计划已存在`, then add the new KOC video under the existing plan's 【素材】. Only check authorization if the page blocks the material append or shows an authorization-related error.
    - If a PM has already created the correct plan and it is active/valid, do not rebuild it. Feedback the visible plan status, plan name/ID, 商品ID, and whether the current素材 is present.
-   - If no matching plan exists, continue to authorization status checks before creating a new plan.
+   - If no matching same达人/抖音号 + 商品ID plan exists, but the same 千川 account already has any active/valid 商品全域投放 / 全域推商品 plan for the same达人/抖音号 under another商品, treat the达人 account authorization as already proven for this account. Do not go to 【抖音号授权】 or 【全域投放授权】 again. Continue directly to 【投放商品】 / 【添加商品】 and build the new商品 plan by exact商品ID. Only return to authorization checks if the new商品 plan flow is blocked by an explicit authorization error.
+   - If no matching plan exists and no same达人 historical active/valid 商品全域 plan exists in this account, continue to authorization status checks before creating a new plan.
 6. Before initiating any new authorization, search the target 千川 account's 【抖音号授权】 and 【全域投放授权】 lists by KOC达人名称 first; if needed also search by 抖音号/ID. Prefer exact matches on达人名称 + 抖音号.
 7. Read the visible authorization status for both rows:
    - If 【抖音号授权】 and 【全域投放授权】 both show `授权生效`, record `授权通过` and go directly to plan building.
